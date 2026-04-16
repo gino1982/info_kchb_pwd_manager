@@ -51,3 +51,4 @@ python manage.py runserver
 
 - 資料庫連線設定請參考 `config/settings.py`
 - 請勿將 `.env` 或含有機密資訊的設定檔上傳至版本控制
+# 這是在 feature/test 分支上的修改
