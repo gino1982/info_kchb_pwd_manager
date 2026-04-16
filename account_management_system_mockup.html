@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>帳號管理系統 — 高雄市政府衛生局</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;background:#f5f5f3;color:#1a1a18}
+:root{
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f5f5f3;
+  --color-text-primary:#1a1a18;
+  --color-text-secondary:#5f5e5a;
+  --color-text-tertiary:#888780;
+  --color-text-info:#185fa5;
+  --color-text-danger:#a32d2d;
+  --color-text-warning:#854f0b;
+  --color-border-tertiary:rgba(0,0,0,0.12);
+  --color-border-secondary:rgba(0,0,0,0.22);
+  --color-border-primary:rgba(0,0,0,0.35);
+  --border-radius-md:8px;
+  --border-radius-lg:12px;
+  --font-mono:"SF Mono","Fira Code",monospace;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --color-background-primary:#1e1e1c;
+    --color-background-secondary:#2a2a28;
+    --color-text-primary:#e8e6e0;
+    --color-text-secondary:#a8a69e;
+    --color-text-tertiary:#6e6c66;
+    --color-text-info:#85b7eb;
+    --color-text-danger:#f09595;
+    --color-text-warning:#fac775;
+    --color-border-tertiary:rgba(255,255,255,0.1);
+    --color-border-secondary:rgba(255,255,255,0.2);
+    --color-border-primary:rgba(255,255,255,0.32);
+  }
+  body{background:#141412;color:#e8e6e0}
+}
+.app{display:flex;min-height:100vh;font-family:inherit;font-size:14px}
+.sidebar{width:200px;flex-shrink:0;background:var(--color-background-secondary);border-right:0.5px solid var(--color-border-tertiary);padding:16px 0}
+.sidebar-logo{padding:0 16px 16px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:8px}
+.logo-text{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.logo-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.nav-section{padding:8px 8px 4px;font-size:11px;color:var(--color-text-tertiary);letter-spacing:.04em;font-weight:500}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;color:var(--color-text-secondary);margin:1px 8px;transition:background .1s}
+.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border:0.5px solid var(--color-border-tertiary)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.topbar-title{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);font-family:inherit}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-primary{background:var(--color-text-primary);color:var(--color-background-primary);border-color:transparent}
+.btn-primary:hover{opacity:.85}
+.btn svg{width:14px;height:14px}
+.content{padding:20px;flex:1}
+.stats-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.stat-label{font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;font-weight:500}
+.stat-value{font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1}
+.stat-sub{font-size:11px;color:var(--color-text-secondary);margin-top:4px}
+.table-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.table-toolbar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.search-box{display:flex;align-items:center;gap:6px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:5px 10px;flex:1;max-width:260px}
+.search-box svg{width:13px;height:13px;opacity:.4;flex-shrink:0}
+.search-box input{border:none;background:transparent;font-size:13px;color:var(--color-text-primary);outline:none;width:100%;font-family:inherit}
+.filter-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--border-radius-md);font-size:12px;cursor:pointer;border:0.5px solid var(--color-border-tertiary);background:transparent;color:var(--color-text-secondary);font-family:inherit}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{text-align:left;padding:8px 16px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);border-bottom:0.5px solid var(--color-border-tertiary);letter-spacing:.04em;background:var(--color-background-secondary)}
+td{padding:10px 16px;font-size:13px;color:var(--color-text-primary);border-bottom:0.5px solid var(--color-border-tertiary)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--color-background-secondary)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.badge-green{background:#EAF3DE;color:#27500A}
+.badge-red{background:#FCEBEB;color:#791F1F}
+.badge-amber{background:#FAEEDA;color:#633806}
+.badge-gray{background:#F1EFE8;color:#5F5E5A}
+.badge-purple{background:#EEEDFE;color:#3C3489}
+.badge-teal{background:#E1F5EE;color:#085041}
+@media(prefers-color-scheme:dark){
+  .badge-green{background:#27500A;color:#C0DD97}
+  .badge-red{background:#791F1F;color:#F7C1C1}
+  .badge-amber{background:#633806;color:#FAC775}
+  .badge-gray{background:#444441;color:#D3D1C7}
+  .badge-purple{background:#3C3489;color:#CECBF6}
+  .badge-teal{background:#085041;color:#9FE1CB}
+}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.dot-green{background:#639922}
+.dot-red{background:#E24B4A}
+.action-link{font-size:12px;color:var(--color-text-info);cursor:pointer;text-decoration:none}
+.action-link:hover{text-decoration:underline}
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;font-size:12px;color:var(--color-text-secondary);border-top:0.5px solid var(--color-border-tertiary)}
+.page-btns{display:flex;gap:4px}
+.page-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);font-size:12px;cursor:pointer;background:transparent;color:var(--color-text-secondary);font-family:inherit}
+.page-btn.active{background:var(--color-text-primary);color:var(--color-background-primary);border-color:transparent}
+.avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.av-purple{background:#EEEDFE;color:#3C3489}
+.av-teal{background:#E1F5EE;color:#085041}
+.av-amber{background:#FAEEDA;color:#633806}
+.av-coral{background:#FAECE7;color:#712B13}
+.av-blue{background:#E6F1FB;color:#0C447C}
+@media(prefers-color-scheme:dark){
+  .av-purple{background:#3C3489;color:#CECBF6}
+  .av-teal{background:#085041;color:#9FE1CB}
+  .av-amber{background:#633806;color:#FAC775}
+  .av-coral{background:#712B13;color:#F5C4B3}
+  .av-blue{background:#0C447C;color:#B5D4F4}
+}
+.name-cell{display:flex;align-items:center;gap:8px}
+.tab-bar{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);padding:0 20px;background:var(--color-background-primary)}
+.tab{padding:10px 16px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.tab.active{color:var(--color-text-primary);font-weight:500;border-bottom-color:var(--color-text-primary)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:100}
+.modal{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-secondary);width:100%;max-width:440px;overflow:hidden}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.modal-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.modal-close{width:24px;height:24px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;border:none;color:var(--color-text-tertiary)}
+.modal-body{padding:20px}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary);font-family:inherit;outline:none}
+.form-input:focus{border-color:var(--color-border-primary)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-select{width:100%;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary);font-family:inherit;outline:none}
+.modal-footer{padding:14px 20px;border-top:0.5px solid var(--color-border-tertiary);display:flex;justify-content:flex-end;gap:8px}
+.page-view{display:none}
+.page-view.active{display:block}
+.detail-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:12px;overflow:hidden}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">帳號管理系統</div>
+      <div class="logo-sub">高雄市政府衛生局</div>
+    </div>
+    <div class="nav-section">主選單</div>
+    <div class="nav-item active" onclick="showPage('employees')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      員工管理
+    </div>
+    <div class="nav-item" onclick="showPage('systems')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
+      系統管理
+    </div>
+    <div class="nav-item" onclick="showPage('accounts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="15" r="4"/><path d="M12 15h8M16 12v6"/></svg>
+      帳號配置
+    </div>
+    <div class="nav-section" style="margin-top:8px">其他</div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      系統設定
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="page-employees" class="page-view active">
+      <div class="topbar">
+        <div class="topbar-title">員工管理</div>
+        <div class="topbar-actions">
+          <button class="btn" onclick="showPage('accounts')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="15" r="4"/><path d="M12 15h8M16 12v6"/></svg>
+            帳號配置
+          </button>
+          <button class="btn btn-primary" onclick="showModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            新增員工
+          </button>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab active">全部 <span style="font-size:11px;margin-left:4px;background:var(--color-background-secondary);padding:1px 7px;border-radius:20px">12</span></div>
+        <div class="tab">在職中 <span style="font-size:11px;margin-left:4px;background:#EAF3DE;color:#27500A;padding:1px 7px;border-radius:20px">9</span></div>
+        <div class="tab">已離職 <span style="font-size:11px;margin-left:4px;background:#FCEBEB;color:#791F1F;padding:1px 7px;border-radius:20px">3</span></div>
+      </div>
+      <div class="content">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">在職員工</div><div class="stat-value">9</div><div class="stat-sub">共 12 人</div></div>
+          <div class="stat-card"><div class="stat-label">本月到職</div><div class="stat-value">2</div><div class="stat-sub">2026 年 4 月</div></div>
+          <div class="stat-card"><div class="stat-label">已配置帳號</div><div class="stat-value">7</div><div class="stat-sub">尚有 2 人未設定</div></div>
+          <div class="stat-card"><div class="stat-label">停用帳號</div><div class="stat-value">3</div><div class="stat-sub">已離職人員</div></div>
+        </div>
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input placeholder="搜尋姓名…">
+            </div>
+            <button class="filter-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
+              篩選
+            </button>
+            <button class="filter-btn" style="margin-left:auto">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              匯出
+            </button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:36px"><input type="checkbox" style="width:14px;height:14px"></th>
+                <th style="width:180px">員工姓名</th>
+                <th style="width:100px">到職日期</th>
+                <th style="width:80px">狀態</th>
+                <th style="width:80px">配置帳號</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" style="width:14px;height:14px"></td>
+                <td><div class="name-cell"><div class="avatar av-purple">陳昱</div><div><div style="font-weight:500">陳昱成</div><div style="font-size:11px;color:var(--color-text-tertiary)">企劃室・資訊股</div></div></div></td>
+                <td style="color:var(--color-text-secondary)">2024-03-01</td>
+                <td><span class="badge badge-green"><span class="dot dot-green"></span>在職</span></td>
+                <td><span style="font-size:13px;font-weight:500">4 套</span></td>
+                <td><a class="action-link" onclick="showPage('detail')">查看</a> · <a class="action-link">帳號</a> · <a class="action-link" style="color:var(--color-text-danger)">編輯</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="width:14px;height:14px"></td>
+                <td><div class="name-cell"><div class="avatar av-teal">林宜</div><div><div style="font-weight:500">林宜珊</div><div style="font-size:11px;color:var(--color-text-tertiary)">企劃室・綜合規劃股</div></div></div></td>
+                <td style="color:var(--color-text-secondary)">2023-08-15</td>
+                <td><span class="badge badge-green"><span class="dot dot-green"></span>在職</span></td>
+                <td><span style="font-size:13px;font-weight:500">3 套</span></td>
+                <td><a class="action-link" onclick="showPage('detail')">查看</a> · <a class="action-link">帳號</a> · <a class="action-link" style="color:var(--color-text-danger)">編輯</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="width:14px;height:14px"></td>
+                <td><div class="name-cell"><div class="avatar av-amber">王建</div><div><div style="font-weight:500">王建民</div><div style="font-size:11px;color:var(--color-text-tertiary)">醫政科・科員</div></div></div></td>
+                <td style="color:var(--color-text-secondary)">2022-01-10</td>
+                <td><span class="badge badge-green"><span class="dot dot-green"></span>在職</span></td>
+                <td><span style="font-size:13px;font-weight:500">5 套</span></td>
+                <td><a class="action-link" onclick="showPage('detail')">查看</a> · <a class="action-link">帳號</a> · <a class="action-link" style="color:var(--color-text-danger)">編輯</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="width:14px;height:14px"></td>
+                <td><div class="name-cell"><div class="avatar av-coral">吳怡</div><div><div style="font-weight:500">吳怡君</div><div style="font-size:11px;color:var(--color-text-tertiary)">疾管科・科員</div></div></div></td>
+                <td style="color:var(--color-text-secondary)">2021-05-20</td>
+                <td><span class="badge badge-red"><span class="dot dot-red"></span>已離職</span></td>
+                <td><span style="font-size:13px;color:var(--color-text-tertiary)">—</span></td>
+                <td><a class="action-link" onclick="showPage('detail')">查看</a> · <a class="action-link" style="color:var(--color-text-tertiary)">帳號</a> · <a class="action-link" style="color:var(--color-text-danger)">編輯</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="width:14px;height:14px"></td>
+                <td><div class="name-cell"><div class="avatar av-blue">張志</div><div><div style="font-weight:500">張志偉</div><div style="font-size:11px;color:var(--color-text-tertiary)">食品藥物管理科</div></div></div></td>
+                <td style="color:var(--color-text-secondary)">2023-11-01</td>
+                <td><span class="badge badge-green"><span class="dot dot-green"></span>在職</span></td>
+                <td><span style="font-size:13px;color:var(--color-text-danger);font-weight:500">未設定</span></td>
+                <td><a class="action-link" onclick="showPage('detail')">查看</a> · <a class="action-link" style="color:var(--color-text-warning);font-weight:500">立即配置</a> · <a class="action-link" style="color:var(--color-text-danger)">編輯</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <span>顯示 1–5，共 12 筆</span>
+            <div class="page-btns">
+              <button class="page-btn">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-systems" class="page-view">
+      <div class="topbar">
+        <div class="topbar-title">系統管理</div>
+        <div class="topbar-actions">
+          <button class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><path d="M12 5v14M5 12h14"/></svg>
+            新增系統
+          </button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">系統總數</div><div class="stat-value">6</div><div class="stat-sub">已建檔系統</div></div>
+          <div class="stat-card"><div class="stat-label">已配置帳號總數</div><div class="stat-value">28</div><div class="stat-sub">跨所有系統</div></div>
+          <div class="stat-card"><div class="stat-label">已停用帳號</div><div class="stat-value">5</div><div class="stat-sub">已離職人員</div></div>
+          <div class="stat-card"><div class="stat-label">平均每人帳號</div><div class="stat-value">3.1</div><div class="stat-sub">套系統</div></div>
+        </div>
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input placeholder="搜尋系統名稱…">
+            </div>
+          </div>
+          <table>
+            <thead><tr>
+              <th style="width:180px">系統名稱</th>
+              <th>網址</th>
+              <th style="width:90px">已配置人數</th>
+              <th style="width:90px">停用數</th>
+              <th style="width:80px">操作</th>
+            </tr></thead>
+            <tbody>
+              <tr><td><div style="font-weight:500">公文系統</div><div style="font-size:11px;color:var(--color-text-tertiary)">第二代整合系統</div></td><td style="color:var(--color-text-info);font-size:12px">doc.kcg.gov.tw</td><td>9 人</td><td><span class="badge badge-red">2</span></td><td><a class="action-link">管理</a></td></tr>
+              <tr><td><div style="font-weight:500">差勤系統</div><div style="font-size:11px;color:var(--color-text-tertiary)">HR 出勤管理</div></td><td style="color:var(--color-text-info);font-size:12px">hr.kcg.gov.tw</td><td>9 人</td><td><span class="badge badge-red">1</span></td><td><a class="action-link">管理</a></td></tr>
+              <tr><td><div style="font-weight:500">人事資訊系統</div><div style="font-size:11px;color:var(--color-text-tertiary)">EIPA</div></td><td style="color:var(--color-text-tertiary);font-size:12px">（內部）</td><td>6 人</td><td><span class="badge badge-gray">0</span></td><td><a class="action-link">管理</a></td></tr>
+              <tr><td><div style="font-weight:500">預算管理系統</div></td><td style="color:var(--color-text-info);font-size:12px">budget.kcg.gov.tw</td><td>4 人</td><td><span class="badge badge-gray">0</span></td><td><a class="action-link">管理</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-accounts" class="page-view">
+      <div class="topbar">
+        <div class="topbar-title">帳號配置</div>
+        <div class="topbar-actions">
+          <button class="btn btn-primary" onclick="showModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><path d="M12 5v14M5 12h14"/></svg>
+            新增帳號
+          </button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input placeholder="搜尋員工或系統…">
+            </div>
+            <button class="filter-btn">所有系統</button>
+            <button class="filter-btn">狀態</button>
+          </div>
+          <table>
+            <thead><tr>
+              <th style="width:160px">員工</th>
+              <th style="width:130px">系統</th>
+              <th style="width:130px">帳號名稱</th>
+              <th style="width:80px">密碼</th>
+              <th style="width:80px">狀態</th>
+              <th>操作</th>
+            </tr></thead>
+            <tbody>
+              <tr><td><div class="name-cell"><div class="avatar av-purple" style="width:22px;height:22px;font-size:10px">陳</div>陳昱成</div></td><td><span class="badge badge-purple">公文系統</span></td><td style="font-family:var(--font-mono);font-size:12px">chen.yc</td><td style="font-family:var(--font-mono);font-size:12px">••••••••</td><td><span class="badge badge-green"><span class="dot dot-green"></span>使用中</span></td><td><a class="action-link">編輯</a> · <a class="action-link" style="color:var(--color-text-danger)">停用</a></td></tr>
+              <tr><td><div class="name-cell"><div class="avatar av-purple" style="width:22px;height:22px;font-size:10px">陳</div>陳昱成</div></td><td><span class="badge badge-teal">差勤系統</span></td><td style="font-family:var(--font-mono);font-size:12px">chen.yc</td><td style="font-family:var(--font-mono);font-size:12px">••••••••</td><td><span class="badge badge-green"><span class="dot dot-green"></span>使用中</span></td><td><a class="action-link">編輯</a> · <a class="action-link" style="color:var(--color-text-danger)">停用</a></td></tr>
+              <tr><td><div class="name-cell"><div class="avatar av-teal" style="width:22px;height:22px;font-size:10px">林</div>林宜珊</div></td><td><span class="badge badge-purple">公文系統</span></td><td style="font-family:var(--font-mono);font-size:12px">lin.ys</td><td style="font-family:var(--font-mono);font-size:12px">••••••••</td><td><span class="badge badge-green"><span class="dot dot-green"></span>使用中</span></td><td><a class="action-link">編輯</a> · <a class="action-link" style="color:var(--color-text-danger)">停用</a></td></tr>
+              <tr><td><div class="name-cell"><div class="avatar av-coral" style="width:22px;height:22px;font-size:10px">吳</div>吳怡君</div></td><td><span class="badge badge-purple">公文系統</span></td><td style="font-family:var(--font-mono);font-size:12px">wu.yj</td><td style="font-family:var(--font-mono);font-size:12px">••••••••</td><td><span class="badge badge-gray">已停用</span></td><td><a class="action-link">查看</a></td></tr>
+              <tr><td><div class="name-cell"><div class="avatar av-amber" style="width:22px;height:22px;font-size:10px">王</div>王建民</div></td><td><span class="badge badge-amber">預算系統</span></td><td style="font-family:var(--font-mono);font-size:12px">wang.jm</td><td style="font-family:var(--font-mono);font-size:12px">••••••••</td><td><span class="badge badge-green"><span class="dot dot-green"></span>使用中</span></td><td><a class="action-link">編輯</a> · <a class="action-link" style="color:var(--color-text-danger)">停用</a></td></tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <span>顯示 1–5，共 28 筆</span>
+            <div class="page-btns">
+              <button class="page-btn">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-detail" class="page-view">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn" onclick="showPage('employees')" style="padding:5px 10px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            返回
+          </button>
+          <div class="topbar-title">員工詳情</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn">編輯資料</button>
+          <button class="btn btn-primary" onclick="showModal()">新增帳號</button>
+        </div>
+      </div>
+      <div class="content">
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:12px;align-items:start">
+          <div>
+            <div class="detail-card">
+              <div style="padding:20px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">
+                <div class="avatar av-purple" style="width:56px;height:56px;font-size:18px;margin:0 auto 10px">陳昱</div>
+                <div style="font-size:16px;font-weight:500;color:var(--color-text-primary)">陳昱成</div>
+                <div style="font-size:12px;color:var(--color-text-secondary);margin-top:3px">企劃室・資訊股</div>
+                <div style="margin-top:10px"><span class="badge badge-green"><span class="dot dot-green"></span>在職中</span></div>
+              </div>
+              <div style="padding:12px 16px">
+                <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:8px;font-weight:500">基本資料</div>
+                <div style="font-size:13px;display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--color-text-secondary)">到職日</span><span style="font-weight:500">2024-03-01</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--color-text-secondary)">離職日</span><span style="color:var(--color-text-tertiary)">—</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--color-text-secondary)">配置帳號</span><span style="font-weight:500">4 套系統</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:500;margin-bottom:10px;color:var(--color-text-primary)">已配置的系統帳號</div>
+            <div class="detail-card">
+              <table style="width:100%;border-collapse:collapse;table-layout:fixed">
+                <thead><tr>
+                  <th style="padding:8px 16px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);text-align:left">系統</th>
+                  <th style="padding:8px 16px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);text-align:left">帳號</th>
+                  <th style="padding:8px 16px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);text-align:left;width:80px">狀態</th>
+                  <th style="padding:8px 16px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);text-align:left;width:80px">操作</th>
+                </tr></thead>
+                <tbody>
+                  <tr><td style="padding:10px 16px;font-size:13px;border-bottom:0.5px solid var(--color-border-tertiary)"><span class="badge badge-purple">公文系統</span></td><td style="padding:10px 16px;font-size:12px;font-family:var(--font-mono);border-bottom:0.5px solid var(--color-border-tertiary)">chen.yc</td><td style="padding:10px 16px;border-bottom:0.5px solid var(--color-border-tertiary)"><span class="badge badge-green">使用中</span></td><td style="padding:10px 16px;border-bottom:0.5px solid var(--color-border-tertiary)"><a class="action-link" style="color:var(--color-text-danger)">停用</a></td></tr>
+                  <tr><td style="padding:10px 16px;font-size:13px;border-bottom:0.5px solid var(--color-border-tertiary)"><span class="badge badge-teal">差勤系統</span></td><td style="padding:10px 16px;font-size:12px;font-family:var(--font-mono);border-bottom:0.5px solid var(--color-border-tertiary)">chen.yc</td><td style="padding:10px 16px;border-bottom:0.5px solid var(--color-border-tertiary)"><span class="badge badge-green">使用中</span></td><td style="padding:10px 16px;border-bottom:0.5px solid var(--color-border-tertiary)"><a class="action-link" style="color:var(--color-text-danger)">停用</a></td></tr>
+                  <tr><td style="padding:10px 16px;font-size:13px;border-bottom:0.5px solid var(--color-border-tertiary)"><span class="badge badge-gray">人事系統</span></td><td style="padding:10px 16px;font-size:12px;font-family:var(--font-mono);border-bottom:0.5px solid var(--color-border-tertiary)">A108-CHEN</td><td style="padding:10px 16px;border-bottom:0.5px solid var(--color-border-tertiary)"><span class="badge badge-green">使用中</span></td><td style="padding:10px 16px;border-bottom:0.5px solid var(--color-border-tertiary)"><a class="action-link" style="color:var(--color-text-danger)">停用</a></td></tr>
+                  <tr><td style="padding:10px 16px;font-size:13px"><span class="badge badge-amber">預算系統</span></td><td style="padding:10px 16px;font-size:12px;font-family:var(--font-mono)">chen_budget</td><td style="padding:10px 16px"><span class="badge badge-green">使用中</span></td><td style="padding:10px 16px"><a class="action-link" style="color:var(--color-text-danger)">停用</a></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-area"></div>
+
+<script>
+const pages = ['employees','systems','accounts','detail'];
+const navItems = document.querySelectorAll('.nav-item');
+function showPage(id){
+  pages.forEach(p=>{document.getElementById('page-'+p).classList.toggle('active',p===id)});
+  const navMap={employees:0,systems:1,accounts:2};
+  navItems.forEach((el,i)=>el.classList.toggle('active',i===navMap[id]));
+  document.getElementById('modal-area').innerHTML='';
+}
+function showModal(){
+  document.getElementById('modal-area').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">新增帳號配置</span>
+        <button class="modal-close" onclick="closeModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">員工</label>
+          <select class="form-select">
+            <option>陳昱成・企劃室資訊股</option>
+            <option>林宜珊・企劃室綜合規劃股</option>
+            <option>王建民・醫政科</option>
+            <option>張志偉・食品藥物管理科</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">系統</label>
+          <select class="form-select">
+            <option>公文系統</option>
+            <option>差勤系統</option>
+            <option>人事資訊系統</option>
+            <option>預算管理系統</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">帳號名稱</label>
+            <input class="form-input" placeholder="例：zhang.zw">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">初始密碼</label>
+            <input class="form-input" type="password" placeholder="••••••••">
+          </div>
+        </div>
+        <div style="margin-top:12px;padding:10px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:12px;color:var(--color-text-secondary)">
+          同一位員工在同一套系統只能有一組帳號，系統會自動檢查。
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="closeModal()">確認新增</button>
+      </div>
+    </div>
+  </div>`;
+}
+function closeModal(){document.getElementById('modal-area').innerHTML='';}
+</script>
+</body>
+</html>
