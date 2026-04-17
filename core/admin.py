@@ -1,4 +1,3 @@
-# main 分支的獨立修改
 from django.db import models
 from django.contrib import admin
 from .models import Employee, SystemApp, Account
