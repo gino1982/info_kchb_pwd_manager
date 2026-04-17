@@ -1,6 +1,38 @@
 {% extends "admin/base.html" %}
 {% load static %}
 
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* :root 代表覆寫整個系統的最高層級變數 */
+    :root {
+        /* 替換側邊欄標題、過濾器標題、以及所有按鈕的顏色 */
+        --primary: #6EC6C7;
+        
+        /* 替換最上方大頭條的背景色 */
+        --header-bg: #6EC6C7;
+
+        /* 按鈕滑鼠游標移過去時，稍微加深一點點，讓介面更有設計層次感 */
+        --secondary: #5CA6A7; 
+
+        /* 控制麵包屑導覽列的背景色 */
+        --breadcrumbs-bg: #125050;
+
+        #site-name a {
+        color: #FFFFFF !important;  /* 強制變成純白色 */
+        font-weight: bold;          /* 變成粗體字 */
+        }
+
+        /*右上角使用者選單設定*/
+        #user-tools, #user-tools a, #user-tools strong, #user-tools button {
+        font-size: 16px !important;   /* 字級加大 (預設約13px，改為16px) */
+        font-weight: bold !important; /* 全部變成粗體字 */
+        }
+
+        
+    }
+</style>
+{% endblock %}
 {% block branding %}
 <div id="site-name">
     <a href="{% url 'admin:index' %}">
