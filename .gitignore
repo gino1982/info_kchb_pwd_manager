@@ -25,3 +25,6 @@ media/
 # OS
 .DS_Store
 Thumbs.db
+
+# 給自己看的指令不須上傳
+終端機指令.txt
