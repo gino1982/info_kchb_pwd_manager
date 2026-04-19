@@ -1,0 +1,281 @@
+/* ============================================================
+   KCHB Design System — Colors & Type
+   高雄市政府衛生局 帳號管理系統
+   Warm earth tones · Rounded · Traditional Chinese first
+   ============================================================ */
+
+/* ---------- Fonts (Google Fonts fallback; flagged to user) ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ========================================================
+     COLOR — Warm earth palette
+     Base neutrals are warm-tinted (oat, linen, clay).
+     Primary is a muted terracotta; accents pull from
+     olive, amber, and rust to stay grounded.
+     ======================================================== */
+
+  /* — Neutrals (warm) — */
+  --oat-50:  #FBF8F2;   /* page background, lightest */
+  --oat-100: #F5EFE4;   /* sidebar, card wash */
+  --oat-200: #EBE3D2;   /* hover, subtle divider */
+  --oat-300: #DCD0B6;   /* borders */
+  --oat-400: #B8A988;   /* muted text on warm */
+  --oat-500: #8A7A5C;   /* secondary text */
+  --oat-600: #5E5340;   /* body on warm bg */
+  --oat-700: #3D3528;   /* headings */
+  --oat-800: #251F16;   /* near-ink */
+  --oat-900: #14100A;   /* ink */
+
+  /* — Primary: Terracotta 陶土 — */
+  --clay-50:  #FBEDE6;
+  --clay-100: #F5D5C4;
+  --clay-200: #EBB299;
+  --clay-300: #DE8C6D;
+  --clay-400: #CC6A46;
+  --clay-500: #B4502E;   /* PRIMARY */
+  --clay-600: #933E23;
+  --clay-700: #712E1B;
+  --clay-800: #4F2013;
+  --clay-900: #30130B;
+
+  /* — Supporting earth tones — */
+  --olive-100: #ECEBD3;
+  --olive-300: #C6C489;
+  --olive-500: #8B8A3F;   /* success / active */
+  --olive-700: #54532A;
+
+  --amber-100: #FAEEDA;
+  --amber-300: #E9C787;
+  --amber-500: #B88436;   /* warning */
+  --amber-700: #7A5416;
+
+  --rust-100: #F6DDD0;
+  --rust-300: #DF9B7C;
+  --rust-500: #B24A22;    /* danger */
+  --rust-700: #7A2F12;
+
+  --sage-100: #DBE7DA;
+  --sage-500: #5F8661;    /* secondary accent */
+
+  --sky-100: #D9E6EC;
+  --sky-500: #5083A1;     /* info — kept muted, not blue-tech */
+
+  /* ========================================================
+     SEMANTIC — Light mode
+     ======================================================== */
+  --bg-app:         var(--oat-50);
+  --bg-surface:     #FFFCF6;
+  --bg-surface-2:   var(--oat-100);
+  --bg-hover:       var(--oat-200);
+  --bg-sunken:      var(--oat-100);
+  --bg-overlay:     rgba(37, 31, 22, 0.48);
+
+  --fg-primary:     var(--oat-900);
+  --fg-secondary:   var(--oat-600);
+  --fg-tertiary:    var(--oat-500);
+  --fg-muted:       var(--oat-400);
+  --fg-on-primary:  #FFFCF6;
+  --fg-link:        var(--clay-600);
+
+  --border-hairline: rgba(61, 53, 40, 0.10);
+  --border-subtle:   rgba(61, 53, 40, 0.16);
+  --border-strong:   rgba(61, 53, 40, 0.32);
+  --border-focus:    var(--clay-500);
+
+  --accent:          var(--clay-500);
+  --accent-hover:    var(--clay-600);
+  --accent-wash:     var(--clay-50);
+
+  --success:         var(--olive-500);
+  --success-wash:    var(--olive-100);
+  --warning:         var(--amber-500);
+  --warning-wash:    var(--amber-100);
+  --danger:          var(--rust-500);
+  --danger-wash:     var(--rust-100);
+  --info:            var(--sky-500);
+  --info-wash:       var(--sky-100);
+
+  /* ========================================================
+     RADIUS — Generous rounding is core to the brand
+     ======================================================== */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;    /* default inputs, buttons */
+  --radius-lg: 20px;    /* cards */
+  --radius-xl: 28px;    /* panels, modals */
+  --radius-pill: 999px;
+
+  /* ========================================================
+     SHADOW — Warm, soft; no cool blue casts
+     ======================================================== */
+  --shadow-xs: 0 1px 2px rgba(61, 53, 40, 0.06);
+  --shadow-sm: 0 2px 6px rgba(61, 53, 40, 0.06), 0 1px 2px rgba(61, 53, 40, 0.04);
+  --shadow-md: 0 6px 16px rgba(61, 53, 40, 0.08), 0 2px 4px rgba(61, 53, 40, 0.04);
+  --shadow-lg: 0 16px 40px rgba(61, 53, 40, 0.14), 0 4px 10px rgba(61, 53, 40, 0.06);
+  --shadow-inset: inset 0 1px 0 rgba(255, 252, 246, 0.6);
+
+  /* ========================================================
+     SPACING — 4px grid
+     ======================================================== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ========================================================
+     TYPE
+     ======================================================== */
+  --font-sans: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "PingFang TC",
+               "Microsoft JhengHei", "Segoe UI", sans-serif;
+  --font-serif: "Noto Serif TC", "PingFang TC", "Songti TC", serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Menlo", "Consolas", monospace;
+
+  /* Scale — Traditional Chinese reads well at slightly larger sizes */
+  --text-2xs: 11px;
+  --text-xs:  12px;
+  --text-sm:  13px;
+  --text-md:  14px;    /* default body */
+  --text-lg:  16px;
+  --text-xl:  18px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+
+  --lh-tight: 1.2;
+  --lh-snug: 1.35;
+  --lh-normal: 1.55;
+  --lh-loose: 1.8;
+
+  /* ========================================================
+     MOTION — Gentle, no bounces
+     ======================================================== */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-med:  200ms;
+  --dur-slow: 320ms;
+}
+
+/* ========================================================
+   DARK MODE — same hues, deeper soil
+   ======================================================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-app:         #17130D;
+    --bg-surface:     #201A12;
+    --bg-surface-2:   #2A231A;
+    --bg-hover:       #342B1F;
+    --bg-sunken:      #17130D;
+    --bg-overlay:     rgba(0, 0, 0, 0.58);
+
+    --fg-primary:     #F1E8D6;
+    --fg-secondary:   #C9BCA0;
+    --fg-tertiary:    #968971;
+    --fg-muted:       #6C614D;
+    --fg-on-primary:  #FFFCF6;
+    --fg-link:        var(--clay-300);
+
+    --border-hairline: rgba(241, 232, 214, 0.08);
+    --border-subtle:   rgba(241, 232, 214, 0.14);
+    --border-strong:   rgba(241, 232, 214, 0.28);
+
+    --accent:       var(--clay-400);
+    --accent-hover: var(--clay-300);
+    --accent-wash:  rgba(180, 80, 46, 0.14);
+
+    --success-wash: rgba(139, 138, 63, 0.18);
+    --warning-wash: rgba(184, 132, 54, 0.18);
+    --danger-wash:  rgba(178, 74, 34, 0.18);
+    --info-wash:    rgba(80, 131, 161, 0.18);
+  }
+}
+
+/* ========================================================
+   BASE ELEMENTS
+   ======================================================== */
+html, body {
+  background: var(--bg-app);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, .h1 {
+  font-family: var(--font-sans);
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.01em;
+  color: var(--fg-primary);
+}
+h2, .h2 {
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  letter-spacing: -0.005em;
+  color: var(--fg-primary);
+}
+h3, .h3 {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  color: var(--fg-primary);
+}
+h4, .h4 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--fg-primary);
+}
+h5, .h5 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--fg-primary);
+}
+
+p, .body {
+  font-size: var(--text-md);
+  line-height: var(--lh-normal);
+  color: var(--fg-secondary);
+}
+
+.display-serif {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+small, .caption {
+  font-size: var(--text-xs);
+  color: var(--fg-tertiary);
+}
+
+.eyebrow {
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+}
+
+code, kbd, .mono {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+}
+
+
+
+a { color: var(--fg-link); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+::selection { background: var(--clay-100); color: var(--clay-800); }
