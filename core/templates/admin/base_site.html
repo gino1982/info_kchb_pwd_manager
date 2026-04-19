@@ -58,12 +58,26 @@
         --hairline-color: rgba(61, 53, 40, 0.10);
     }
 
-    /* ---- Logo / 站名：強制白字加粗 ---- */
+    /* ---- Logo / 站名：強制白字加粗 (改用思源宋體) ---- */
     #site-name a {
         color: #FFFFFF !important;
-        font-weight: 700 !important;
-        font-family: "Noto Sans TC", -apple-system, "Microsoft JhengHei", sans-serif !important;
+        
+        /* 指定使用思源宋體 (Noto Serif TC)，如果抓不到再退回一般 serif */
+        font-family: "Noto Serif TC", "Source Han Serif TC", serif !important; 
+        
+        font-weight: 700 !important; /* 粗度：700 粗體 */
+        font-size: 24px !important;  /* 字級：24px */
+        letter-spacing: 1.5px !important; /* 稍微拉開字距，增加大氣感 */
     }
+
+    #content h1 {
+        font-family: "Noto Serif TC", "Source Han Serif TC", serif !important;
+        font-weight: 700 !important;          /* 一樣使用 700 粗體增加份量 */
+        letter-spacing: 1px !important;       /* 稍微拉開一點字距 */
+        color: #5C3A21 !important;            /* 換成深咖啡色，跟你的大地色系更搭 */
+        text-align: center !important;
+    }
+
 
     /* ---- 右上角使用者工具：字級加大 + 粗體 ---- */
     #user-tools,
@@ -178,12 +192,29 @@
         color: var(--header-color, #FFFCF6) !important;
         padding: 10px 15px !important;
         margin: 0 !important;
-        font-weight: 600 !important;
+        text-align: center !important;  
+        
+        /* ⬇️⬇️ 新增字體設定 ⬇️⬇️ */
+        font-family: "Noto Serif TC", "Source Han Serif TC", serif !important; 
+        font-weight: 700 !important; 
+        letter-spacing: 1px !important;
     }
 
     #content-related .module h3 {
         display: none !important;
     }
+
+    /* ⬇️⬇️⬇️ 左側模組標題：置中、思源宋體、放大兩號 ⬇️⬇️⬇️ */
+    #content-main .module caption,
+    #content-main .module caption a {
+        text-align: center !important;
+        font-family: "Noto Serif TC", "Source Han Serif TC", serif !important;
+        font-size: 16px !important;   /* 字級放大兩號 */
+        font-weight: 700 !important;  /* 搭配宋體加粗 */
+        letter-spacing: 1px !important;
+    }
+    /* ⬆️⬆️⬆️ ---------------------------------------- ⬆️⬆️⬆️ */
+
 
 </style>
 {% endblock %}
