@@ -76,6 +76,7 @@
         letter-spacing: 1px !important;       /* 稍微拉開一點字距 */
         color: #5C3A21 !important;            /* 換成深咖啡色，跟你的大地色系更搭 */
         text-align: center !important;
+        margin-top: 20px;
     }
 
 
@@ -215,22 +216,23 @@
     }
     /* ⬆️⬆️⬆️ ---------------------------------------- ⬆️⬆️⬆️ */
 
-    /* Center dashboard content with a fixed max-width container */
+    /* Center dashboard content with a responsive width around 80% */
     body.dashboard #content {
-        max-width: 1180px !important;
+        width: min(80vw, 1280px) !important;
+        max-width: none !important;
         margin: 0 auto !important;
-        padding: 0 20px !important;
+        padding: 0 12px !important;
     }
 
     body.dashboard #content-main {
         float: left !important;
-        width: 68% !important;
+        width: 66% !important;
         margin-right: 2% !important;
     }
 
     body.dashboard #content-related {
         float: right !important;
-        width: 30% !important;
+        width: 32% !important;
         margin-right: 0 !important;
     }
 
