@@ -1,4 +1,8 @@
 from django.shortcuts import render
+from django.http import JsonResponse
+from django.db.models import Count
+
+from .models import Employee, Account
 
 # home (首頁)
 def home(request):

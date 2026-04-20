@@ -1,0 +1,38 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module" style="padding: 30px; text-align: center;">
+        <h2 style="margin-bottom: 20px;">📊 Excel 帳戶批次匯入</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p style="color: var(--fg-secondary); margin-bottom: 30px;">
+                請上傳 .xlsx 檔案。<br>
+                <b>【重要提醒】</b> Excel 的第一列標題必須包含：<br>
+                <code style="color: var(--primary);">員工姓名</code>
+                <span style="color: var(--fg-muted);">(必填)</span>、
+                <code style="color: var(--primary);">系統名稱</code>
+                <span style="color: var(--fg-muted);">(必填)</span>、
+                <code style="color: var(--primary);">登入帳號</code>
+                <span style="color: var(--fg-muted);">(必填)</span>、
+                <code style="color: var(--primary);">密碼</code>
+                <span style="color: var(--fg-muted);">(必填)</span>、
+                <code style="color: var(--primary);">是否停用</code>
+                <span style="color: var(--fg-muted);">(可空，填 是/否)</span>
+            </p>
+
+            <input type="file" name="excel_file" accept=".xlsx, .xls" required
+                   style="margin: 20px 0; padding: 10px; border: 1px dashed var(--border-strong);">
+
+            <br><br>
+            <button type="submit" class="button" style="background-color: var(--primary); color: white; padding: 10px 24px; font-size: 16px;">
+            匯入
+            </button>
+            <a href=".." class="button" style="background-color: var(--bg-hover); color: var(--fg-primary); margin-left: 10px; padding: 10px 24px; font-size: 16px;">
+                返回
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

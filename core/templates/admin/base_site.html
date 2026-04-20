@@ -215,6 +215,40 @@
     }
     /* ⬆️⬆️⬆️ ---------------------------------------- ⬆️⬆️⬆️ */
 
+    /* Center dashboard content with a fixed max-width container */
+    body.dashboard #content {
+        max-width: 1180px !important;
+        margin: 0 auto !important;
+        padding: 0 20px !important;
+    }
+
+    body.dashboard #content-main {
+        float: left !important;
+        width: 68% !important;
+        margin-right: 2% !important;
+    }
+
+    body.dashboard #content-related {
+        float: right !important;
+        width: 30% !important;
+        margin-right: 0 !important;
+    }
+
+    body.dashboard #content:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    @media (max-width: 1024px) {
+        body.dashboard #content-main,
+        body.dashboard #content-related {
+            float: none !important;
+            width: 100% !important;
+            margin-right: 0 !important;
+        }
+    }
+
 
 </style>
 {% endblock %}

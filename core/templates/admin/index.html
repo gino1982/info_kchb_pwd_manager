@@ -6,19 +6,19 @@
 <div style="display: flex; gap: 20px; margin-bottom: 30px;">
     
     <div class="module" style="flex: 1; padding: 20px; background: var(--darkened-bg); border-radius: 20px;">
-        <caption style="text-align: center; font-family: 'Noto Serif TC', serif; font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px;">
-            🏢 各單位人數分佈
-        </caption>
-        <div style="height: 250px;">
+        <div style="text-align: center; font-family: 'Noto Serif TC', 'Source Han Serif TC', serif; font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px;">
+        各單位人數分佈
+        </div>
+        <div id="deptChartContainer" style="position: relative; height: 250px; width: 100%;">
             <canvas id="deptChart"></canvas>
         </div>
     </div>
 
     <div class="module" style="flex: 1; padding: 20px; background: var(--darkened-bg); border-radius: 20px;">
-        <caption style="text-align: center; font-family: 'Noto Serif TC', serif; font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px;">
-            🔐 各系統帳號配置數
-        </caption>
-        <div style="height: 250px;">
+        <div style="text-align: center; font-family: 'Noto Serif TC', 'Source Han Serif TC', serif; font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px;">
+        各系統帳號配置數
+        </div>
+        <div id="sysChartContainer" style="position: relative; height: 250px; width: 100%;">
             <canvas id="sysChart"></canvas>
         </div>
     </div>
@@ -29,43 +29,67 @@
 
 <script>
     fetch('/api/dashboard/')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                // 如果後端報錯，直接把錯誤訊息抓出來
+                return response.text().then(text => { throw new Error(text) });
+            }
+            return response.json();
+        })
         .then(data => {
             
-            // 繪製左側：甜甜圈圖 (Doughnut)
-            new Chart(document.getElementById('deptChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: data.dept_labels,
-                    datasets: [{
-                        data: data.dept_counts,
-                        // 教練特別幫你挑選配對你系統的溫暖大地色系！
-                        backgroundColor: ['#B4502E', '#DF9B7C', '#8B8A3F', '#B88436', '#5F8661', '#5083A1', '#3D3528'],
-                        borderWidth: 2,
-                        borderColor: '#FFFCF6'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+            // --- 繪製左側：各單位人數 ---
+            if (!data.dept_labels || data.dept_labels.length === 0) {
+                // 修正點 3：沒有資料時顯示溫馨提示
+                document.getElementById('deptChartContainer').innerHTML = 
+                    '<div style="text-align:center; padding-top:100px; color:var(--fg-muted);">目前沒有員工單位資料喔！</div>';
+            } else {
+                new Chart(document.getElementById('deptChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.dept_labels,
+                        datasets: [{
+                            data: data.dept_counts,
+                            backgroundColor: ['#B4502E', '#DF9B7C', '#8B8A3F', '#B88436', '#5F8661', '#5083A1', '#3D3528'],
+                            borderWidth: 2,
+                            borderColor: '#FFFCF6'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
 
-            // 繪製右側：長條圖 (Bar)
-            new Chart(document.getElementById('sysChart'), {
-                type: 'bar',
-                data: {
-                    labels: data.sys_labels,
-                    datasets: [{
-                        label: '已配置帳號數量',
-                        data: data.sys_counts,
-                        backgroundColor: '#B4502E', // 你的主色：陶土色
-                        borderRadius: 6 // 讓長條圖的頂端也有小圓角
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } } // 隱藏多餘的標籤
-                }
-            });
+            // --- 繪製右側：各系統帳號數 ---
+            if (!data.sys_labels || data.sys_labels.length === 0) {
+                document.getElementById('sysChartContainer').innerHTML = 
+                    '<div style="text-align:center; padding-top:100px; color:var(--fg-muted);">目前還沒有配置任何帳號喔！</div>';
+            } else {
+                new Chart(document.getElementById('sysChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: data.sys_labels,
+                        datasets: [{
+                            label: '已配置帳號數量',
+                            data: data.sys_counts,
+                            backgroundColor: '#B4502E', 
+                            borderRadius: 6 
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } } 
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            // 終極防呆：把錯誤訊息直接印在畫面上
+            console.error("圖表發生錯誤:", error);
+            document.getElementById('deptChartContainer').innerHTML = 
+                `<div style="color: red; overflow-y: auto; height: 100%; font-size: 12px; border: 1px solid red; padding: 10px;"><b>後端 API 發生錯誤：</b><br>${error.message}</div>`;
+            document.getElementById('sysChartContainer').innerHTML = 
+                '<div style="text-align:center; padding-top:100px; color:red;">⚠️ 無法載入資料</div>';
         });
 </script>
 {% endblock %}
