@@ -10,6 +10,7 @@ from .excel_import import (
     parse_date,
     require_str,
     today,
+    upsert,
 )
 from .models import Account, Employee, SystemApp
 
@@ -103,6 +104,11 @@ class AccountAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.import_excel),
                 name='import_account_excel',
             ),
+            path(
+                'import-all/',
+                self.admin_site.admin_view(self.import_combined_excel),
+                name='import_combined_excel',
+            ),
         ]
         return my_urls + super().get_urls()
 
@@ -112,6 +118,14 @@ class AccountAdmin(admin.ModelAdmin):
             template_name="admin/excel_upload_account.html",
             entity_label="帳戶",
             row_handler=_import_account_row,
+        )
+
+    def import_combined_excel(self, request):
+        return handle_excel_import(
+            request,
+            template_name="admin/excel_upload_combined.html",
+            entity_label="總表",
+            row_handler=_import_combined_row,
         )
 
 
@@ -136,5 +150,43 @@ def _import_account_row(row, row_num):
             'username': username,
             'password': password,
             'is_revoked': is_revoked,
+        },
+    )
+
+
+def _import_combined_row(row, row_num):
+    """總表匯入：一列同時建立/更新員工、系統、帳號。"""
+    employee_name = require_str(get_value(row, ['員工姓名', '姓名']), '員工姓名', row_num)
+    system_name = require_str(get_value(row, ['系統名稱', '所屬系統']), '系統名稱', row_num)
+    username = require_str(get_value(row, ['登入帳號', '帳號']), '登入帳號', row_num)
+    password = require_str(get_value(row, ['密碼', '加密密碼']), '密碼', row_num)
+
+    employee = upsert(
+        Employee,
+        lookup={'name': employee_name},
+        values={
+            'department': clean_str(get_value(row, ['所屬單位'])),
+            'job_title': clean_str(get_value(row, ['職稱'])),
+            'onboard_date': parse_date(get_value(row, ['到職日']), default=None),
+        },
+        create_defaults={'onboard_date': today(), 'is_active': True},
+    )
+
+    system = upsert(
+        SystemApp,
+        lookup={'name': system_name},
+        values={
+            'url': clean_str(get_value(row, ['系統網址'])),
+            'description': clean_str(get_value(row, ['備註說明'])),
+        },
+    )
+
+    Account.objects.update_or_create(
+        employee=employee,
+        system=system,
+        defaults={
+            'username': username,
+            'password': password,
+            'is_revoked': parse_bool(get_value(row, ['是否停用', '權限是否已取消'])),
         },
     )

@@ -1,0 +1,53 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module" style="padding: 30px; text-align: center;">
+        <h2 style="margin-bottom: 20px;">📘 Excel 總表批次匯入</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p style="color: var(--fg-secondary); margin-bottom: 20px;">
+                一張表同時建立／更新
+                <b>員工 + 系統 + 帳戶</b>。
+                每一列代表「某員工在某系統的一組帳密」。
+            </p>
+
+            <p style="color: var(--fg-secondary); margin-bottom: 10px;">
+                <b>【必填欄位】</b>
+            </p>
+            <p style="color: var(--fg-secondary); margin-bottom: 20px;">
+                <code style="color: var(--primary);">員工姓名</code>、
+                <code style="color: var(--primary);">系統名稱</code>、
+                <code style="color: var(--primary);">登入帳號</code>、
+                <code style="color: var(--primary);">密碼</code>
+            </p>
+
+            <p style="color: var(--fg-secondary); margin-bottom: 10px;">
+                <b>【選填欄位】</b>
+                <span style="color: var(--fg-muted);">（留空不會覆蓋既有資料）</span>
+            </p>
+            <p style="color: var(--fg-secondary); margin-bottom: 30px;">
+                <code style="color: var(--primary);">所屬單位</code>、
+                <code style="color: var(--primary);">職稱</code>、
+                <code style="color: var(--primary);">到職日</code>、
+                <code style="color: var(--primary);">系統網址</code>、
+                <code style="color: var(--primary);">備註說明</code>、
+                <code style="color: var(--primary);">是否停用</code>
+                <span style="color: var(--fg-muted);">（填 是／否）</span>
+            </p>
+
+            <input type="file" name="excel_file" accept=".xlsx, .xls" required
+                   style="margin: 20px 0; padding: 10px; border: 1px dashed var(--border-strong);">
+
+            <br><br>
+            <button type="submit" class="button" style="background-color: var(--primary); color: white; padding: 10px 24px; font-size: 16px;">
+                匯入
+            </button>
+            <a href=".." class="button" style="background-color: var(--bg-hover); color: var(--fg-primary); margin-left: 10px; padding: 10px 24px; font-size: 16px;">
+                返回
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

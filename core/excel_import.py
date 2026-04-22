@@ -54,6 +54,33 @@ def today():
     return datetime.now().date()
 
 
+def upsert(model, lookup, values, create_defaults=None):
+    """僅用「非空值」更新既有資料；若不存在則以 values + create_defaults 建立。
+
+    values 中為 None 或 "" 的欄位會被忽略（不會把既有資料洗成空）。
+    create_defaults 用來補齊「新增時必填但 values 沒給」的欄位預設值。
+    """
+    creation = dict(create_defaults or {})
+    for key, value in values.items():
+        if value not in (None, ""):
+            creation[key] = value
+
+    obj, created = model.objects.get_or_create(**lookup, defaults=creation)
+    if created:
+        return obj
+
+    changed = False
+    for key, value in values.items():
+        if value in (None, ""):
+            continue
+        if getattr(obj, key) != value:
+            setattr(obj, key, value)
+            changed = True
+    if changed:
+        obj.save()
+    return obj
+
+
 def handle_excel_import(request, *, template_name, entity_label, row_handler):
     """通用 Excel 匯入流程。
 
