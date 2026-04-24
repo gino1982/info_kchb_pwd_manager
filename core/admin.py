@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path
+from django.utils.html import format_html
 
 from .excel_import import (
     ImportRowError,
@@ -7,13 +8,26 @@ from .excel_import import (
     combined_template_response,
     get_value,
     handle_excel_import,
-    parse_bool,
     parse_date,
+    parse_permission,
     require_str,
     today,
     upsert,
 )
 from .models import Account, Employee, SystemApp
+
+
+_PERMISSION_BADGE = (
+    '<span style="display:inline-block;width:18px;height:18px;border-radius:50%;'
+    'background:{bg};color:white;text-align:center;line-height:18px;'
+    'font-weight:bold;font-size:12px;">{mark}</span>'
+)
+
+
+def _render_permission(has_permission):
+    if has_permission:
+        return format_html(_PERMISSION_BADGE, bg="#22C55E", mark="✓")
+    return format_html(_PERMISSION_BADGE, bg="#EF4444", mark="✗")
 
 
 # 1. 註冊員工表
@@ -94,9 +108,13 @@ def _import_systemapp_row(row, row_num):
 # 3. 註冊帳密配置表
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('employee', 'system', 'username', 'is_revoked')
-    list_filter = ('is_revoked', 'system')
+    list_display = ('employee', 'system', 'username', 'permission_badge')
+    list_filter = ('has_permission', 'system')
     search_fields = ('employee__name', 'username')
+
+    @admin.display(description='權限', ordering='has_permission', boolean=False)
+    def permission_badge(self, obj):
+        return _render_permission(obj.has_permission)
 
     def get_urls(self):
         my_urls = [
@@ -143,7 +161,7 @@ def _import_account_row(row, row_num):
     system_name = require_str(get_value(row, ['系統名稱', '所屬系統']), '系統名稱', row_num)
     username = require_str(get_value(row, ['登入帳號', '帳號']), '登入帳號', row_num)
     password = clean_str(get_value(row, ['密碼', '加密密碼']))
-    is_revoked = parse_bool(get_value(row, ['是否停用', '權限是否已取消']))
+    has_permission = parse_permission(row)
 
     employee = Employee.objects.filter(name=employee_name).first()
     if not employee:
@@ -158,7 +176,7 @@ def _import_account_row(row, row_num):
         defaults={
             'username': username,
             'password': password,
-            'is_revoked': is_revoked,
+            'has_permission': has_permission,
         },
     )
 
@@ -196,6 +214,6 @@ def _import_combined_row(row, row_num):
         defaults={
             'username': username,
             'password': password,
-            'is_revoked': parse_bool(get_value(row, ['是否停用', '權限是否已取消'])),
+            'has_permission': parse_permission(row),
         },
     )

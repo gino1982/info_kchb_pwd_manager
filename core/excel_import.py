@@ -49,6 +49,23 @@ def parse_bool(value):
     return str(value).strip().lower() in {"1", "true", "t", "yes", "y", "是"}
 
 
+def parse_permission(row):
+    """從多種可能欄位名解析「權限」狀態，回傳 has_permission (True/False)。
+
+    支援兩種語意極性以保留向下相容：
+      - 正向欄位（True 表示「有權限」）：權限、是否有權限
+      - 反向欄位（True 表示「無權限」）：是否停用、權限是否已取消
+    皆未提供時，預設為 True（有權限）。
+    """
+    direct = get_value(row, ['權限', '是否有權限'])
+    if direct is not None:
+        return parse_bool(direct)
+    inverse = get_value(row, ['是否停用', '權限是否已取消'])
+    if inverse is not None:
+        return not parse_bool(inverse)
+    return True
+
+
 def parse_date(value, default=None):
     if value is None or pd.isna(value):
         return default() if callable(default) else default
@@ -94,7 +111,7 @@ COMBINED_TEMPLATE_OPTIONAL = [
     '到職日',
     '系統網址',
     '備註說明',
-    '是否停用',
+    '權限',
 ]
 COMBINED_TEMPLATE_COLUMNS = COMBINED_TEMPLATE_REQUIRED + COMBINED_TEMPLATE_OPTIONAL
 
