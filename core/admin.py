@@ -108,7 +108,7 @@ def _import_systemapp_row(row, row_num):
 # 3. 註冊帳密配置表
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('employee', 'system', 'username', 'permission_badge')
+    list_display = ('employee', 'system', 'email', 'username', 'permission_badge')
     list_filter = ('has_permission', 'system')
     search_fields = ('employee__name', 'username')
 
