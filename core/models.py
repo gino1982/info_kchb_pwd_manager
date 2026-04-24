@@ -34,7 +34,7 @@ class Account(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name="所屬員工")
     system = models.ForeignKey(SystemApp, on_delete=models.CASCADE, verbose_name="所屬系統")
     username = models.CharField(max_length=100, verbose_name="登入帳號")
-    password = models.CharField(max_length=255, blank=True, verbose_name="加密密碼")
+    email = models.EmailField(max_length=255, verbose_name="電子信箱")
     has_permission = models.BooleanField(default=True, verbose_name="權限")
 
     class Meta:
