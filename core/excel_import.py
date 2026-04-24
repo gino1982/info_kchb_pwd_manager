@@ -1,10 +1,15 @@
 """Excel 匯入共用工具：封裝欄位取值、型別轉換、以及匯入流程樣板。"""
 
 from datetime import datetime
+from io import BytesIO
 
 import pandas as pd
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
+from openpyxl.utils import get_column_letter
 
 
 class ImportRowError(Exception):
@@ -79,6 +84,60 @@ def upsert(model, lookup, values, create_defaults=None):
     if changed:
         obj.save()
     return obj
+
+
+COMBINED_TEMPLATE_REQUIRED = ['員工姓名', '系統名稱', '登入帳號']
+COMBINED_TEMPLATE_OPTIONAL = [
+    '密碼',
+    '所屬單位',
+    '職稱',
+    '到職日',
+    '系統網址',
+    '備註說明',
+    '是否停用',
+]
+COMBINED_TEMPLATE_COLUMNS = COMBINED_TEMPLATE_REQUIRED + COMBINED_TEMPLATE_OPTIONAL
+
+
+def build_combined_template_xlsx():
+    """動態產生總表匯入用的 Excel 模板（只含標題列）。
+
+    必填欄以深底白字標示；選填欄留原色，幫使用者一眼分辨。
+    """
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "總表範例"
+    ws.append(COMBINED_TEMPLATE_COLUMNS)
+
+    required_fill = PatternFill(start_color="B4502E", end_color="B4502E", fill_type="solid")
+    bold_white = Font(bold=True, color="FFFFFF")
+    bold_dark = Font(bold=True)
+
+    for idx, name in enumerate(COMBINED_TEMPLATE_COLUMNS, start=1):
+        cell = ws.cell(row=1, column=idx)
+        if name in COMBINED_TEMPLATE_REQUIRED:
+            cell.fill = required_fill
+            cell.font = bold_white
+        else:
+            cell.font = bold_dark
+        ws.column_dimensions[get_column_letter(idx)].width = max(len(name) * 2 + 4, 12)
+
+    ws.freeze_panes = "A2"
+    return wb
+
+
+def combined_template_response(filename="系統帳密管理_總表範例.xlsx"):
+    """把動態產生的模板包成 HttpResponse 回傳給瀏覽器下載。"""
+    wb = build_combined_template_xlsx()
+    buffer = BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+    response = HttpResponse(
+        buffer.getvalue(),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return response
 
 
 def handle_excel_import(request, *, template_name, entity_label, row_handler):

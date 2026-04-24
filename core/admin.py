@@ -4,6 +4,7 @@ from django.urls import path
 from .excel_import import (
     ImportRowError,
     clean_str,
+    combined_template_response,
     get_value,
     handle_excel_import,
     parse_bool,
@@ -109,6 +110,11 @@ class AccountAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.import_combined_excel),
                 name='import_combined_excel',
             ),
+            path(
+                'download-template/',
+                self.admin_site.admin_view(self.download_combined_template),
+                name='download_combined_template',
+            ),
         ]
         return my_urls + super().get_urls()
 
@@ -128,12 +134,15 @@ class AccountAdmin(admin.ModelAdmin):
             row_handler=_import_combined_row,
         )
 
+    def download_combined_template(self, request):
+        return combined_template_response()
+
 
 def _import_account_row(row, row_num):
     employee_name = require_str(get_value(row, ['員工姓名', '姓名']), '員工姓名', row_num)
     system_name = require_str(get_value(row, ['系統名稱', '所屬系統']), '系統名稱', row_num)
     username = require_str(get_value(row, ['登入帳號', '帳號']), '登入帳號', row_num)
-    password = require_str(get_value(row, ['密碼', '加密密碼']), '密碼', row_num)
+    password = clean_str(get_value(row, ['密碼', '加密密碼']))
     is_revoked = parse_bool(get_value(row, ['是否停用', '權限是否已取消']))
 
     employee = Employee.objects.filter(name=employee_name).first()
@@ -159,7 +168,7 @@ def _import_combined_row(row, row_num):
     employee_name = require_str(get_value(row, ['員工姓名', '姓名']), '員工姓名', row_num)
     system_name = require_str(get_value(row, ['系統名稱', '所屬系統']), '系統名稱', row_num)
     username = require_str(get_value(row, ['登入帳號', '帳號']), '登入帳號', row_num)
-    password = require_str(get_value(row, ['密碼', '加密密碼']), '密碼', row_num)
+    password = clean_str(get_value(row, ['密碼', '加密密碼']))
 
     employee = upsert(
         Employee,
