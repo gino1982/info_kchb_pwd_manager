@@ -160,7 +160,7 @@ def _import_account_row(row, row_num):
     employee_name = require_str(get_value(row, ['員工姓名', '姓名']), '員工姓名', row_num)
     system_name = require_str(get_value(row, ['系統名稱', '所屬系統']), '系統名稱', row_num)
     username = require_str(get_value(row, ['登入帳號', '帳號']), '登入帳號', row_num)
-    password = clean_str(get_value(row, ['密碼', '加密密碼']))
+    email = require_str(get_value(row, ['電子信箱', 'Email', 'email']), '電子信箱', row_num)
     has_permission = parse_permission(row)
 
     employee = Employee.objects.filter(name=employee_name).first()
@@ -175,7 +175,7 @@ def _import_account_row(row, row_num):
         system=system,
         defaults={
             'username': username,
-            'password': password,
+            'email': email,
             'has_permission': has_permission,
         },
     )
@@ -186,7 +186,7 @@ def _import_combined_row(row, row_num):
     employee_name = require_str(get_value(row, ['員工姓名', '姓名']), '員工姓名', row_num)
     system_name = require_str(get_value(row, ['系統名稱', '所屬系統']), '系統名稱', row_num)
     username = require_str(get_value(row, ['登入帳號', '帳號']), '登入帳號', row_num)
-    password = clean_str(get_value(row, ['密碼', '加密密碼']))
+    email = require_str(get_value(row, ['電子信箱', 'Email', 'email']), '電子信箱', row_num)
 
     employee = upsert(
         Employee,
@@ -213,7 +213,7 @@ def _import_combined_row(row, row_num):
         system=system,
         defaults={
             'username': username,
-            'password': password,
+            'email': email,
             'has_permission': parse_permission(row),
         },
     )

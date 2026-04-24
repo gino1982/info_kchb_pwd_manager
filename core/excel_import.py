@@ -103,9 +103,8 @@ def upsert(model, lookup, values, create_defaults=None):
     return obj
 
 
-COMBINED_TEMPLATE_REQUIRED = ['員工姓名', '系統名稱', '登入帳號']
+COMBINED_TEMPLATE_REQUIRED = ['員工姓名', '系統名稱', '登入帳號', '電子信箱']
 COMBINED_TEMPLATE_OPTIONAL = [
-    '密碼',
     '所屬單位',
     '職稱',
     '到職日',
