@@ -173,9 +173,9 @@ def _import_account_row(row, row_num):
     Account.objects.update_or_create(
         employee=employee,
         system=system,
+        username=username,
+        email=email,
         defaults={
-            'username': username,
-            'email': email,
             'has_permission': has_permission,
         },
     )
@@ -211,9 +211,9 @@ def _import_combined_row(row, row_num):
     Account.objects.update_or_create(
         employee=employee,
         system=system,
+        username=username,
+        email=email,
         defaults={
-            'username': username,
-            'email': email,
             'has_permission': parse_permission(row),
         },
     )
