@@ -38,8 +38,8 @@ class Account(models.Model):
     has_permission = models.BooleanField(default=True, verbose_name="權限")
 
     class Meta:
-        # 防呆機制：一人一系統只能有一組帳號！
-        unique_together = ('employee', 'system')
+        # 防呆機制：四欄全同才視為重複。
+        unique_together = ('employee', 'system', 'username', 'email')
         verbose_name = "帳戶"
         verbose_name_plural = "帳戶"
 
