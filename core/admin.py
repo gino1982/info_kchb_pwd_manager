@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from django.utils.html import format_html
+import hashlib
 
 from .excel_import import (
     ImportRowError,
@@ -30,12 +31,30 @@ def _render_permission(has_permission):
     return format_html(_PERMISSION_BADGE, bg="#EF4444", mark="✗")
 
 
+def _normalize_national_id(raw_value):
+    return clean_str(raw_value).upper()
+
+
+def _national_id_hash(national_id):
+    return hashlib.sha256(national_id.encode("utf-8")).hexdigest()
+
+
+def _national_id_last3(national_id):
+    return national_id[-3:] if len(national_id) >= 3 else national_id
+
+
 # 1. 註冊員工表
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'department', 'job_title', 'onboard_date', 'is_active')
+    list_display = ('name', 'national_id_mask', 'department', 'job_title', 'onboard_date', 'is_active')
     list_filter = ('is_active', 'department')
-    search_fields = ('name', 'department', 'job_title')
+    search_fields = ('name', 'national_id_last3', 'department', 'job_title')
+
+    @admin.display(description='身分證末三碼', ordering='national_id_last3')
+    def national_id_mask(self, obj):
+        if not obj.national_id_last3:
+            return ""
+        return f"***{obj.national_id_last3}"
 
     def get_urls(self):
         my_urls = [
@@ -58,10 +77,14 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 def _import_employee_row(row, row_num):
     name = require_str(get_value(row, ['姓名']), '姓名', row_num)
+    national_id = require_str(get_value(row, ['身分證號', '身分證字號']), '身分證號', row_num)
+    national_id = _normalize_national_id(national_id)
     onboard_date = parse_date(get_value(row, ['到職日']), default=today)
     Employee.objects.update_or_create(
-        name=name,
+        national_id_hash=_national_id_hash(national_id),
         defaults={
+            'name': name,
+            'national_id_last3': _national_id_last3(national_id),
             'department': clean_str(get_value(row, ['所屬單位'])),
             'job_title': clean_str(get_value(row, ['職稱'])),
             'onboard_date': onboard_date,
@@ -158,14 +181,16 @@ class AccountAdmin(admin.ModelAdmin):
 
 def _import_account_row(row, row_num):
     employee_name = require_str(get_value(row, ['員工姓名', '姓名']), '員工姓名', row_num)
+    national_id = require_str(get_value(row, ['身分證號', '身分證字號']), '身分證號', row_num)
+    national_id = _normalize_national_id(national_id)
     system_name = require_str(get_value(row, ['系統名稱', '所屬系統']), '系統名稱', row_num)
     username = require_str(get_value(row, ['登入帳號', '帳號']), '登入帳號', row_num)
     email = require_str(get_value(row, ['電子信箱', 'Email', 'email']), '電子信箱', row_num)
     has_permission = parse_permission(row)
 
-    employee = Employee.objects.filter(name=employee_name).first()
+    employee = Employee.objects.filter(national_id_hash=_national_id_hash(national_id)).first()
     if not employee:
-        raise ImportRowError(f"第 {row_num} 列：找不到員工「{employee_name}」")
+        raise ImportRowError(f"第 {row_num} 列：找不到員工「{employee_name}／***{_national_id_last3(national_id)}」")
     system = SystemApp.objects.filter(name=system_name).first()
     if not system:
         raise ImportRowError(f"第 {row_num} 列：找不到系統「{system_name}」")
@@ -173,9 +198,9 @@ def _import_account_row(row, row_num):
     Account.objects.update_or_create(
         employee=employee,
         system=system,
+        username=username,
+        email=email,
         defaults={
-            'username': username,
-            'email': email,
             'has_permission': has_permission,
         },
     )
@@ -184,14 +209,18 @@ def _import_account_row(row, row_num):
 def _import_combined_row(row, row_num):
     """總表匯入：一列同時建立/更新員工、系統、帳號。"""
     employee_name = require_str(get_value(row, ['員工姓名', '姓名']), '員工姓名', row_num)
+    national_id = require_str(get_value(row, ['身分證號', '身分證字號']), '身分證號', row_num)
+    national_id = _normalize_national_id(national_id)
     system_name = require_str(get_value(row, ['系統名稱', '所屬系統']), '系統名稱', row_num)
     username = require_str(get_value(row, ['登入帳號', '帳號']), '登入帳號', row_num)
     email = require_str(get_value(row, ['電子信箱', 'Email', 'email']), '電子信箱', row_num)
 
     employee = upsert(
         Employee,
-        lookup={'name': employee_name},
+        lookup={'national_id_hash': _national_id_hash(national_id)},
         values={
+            'name': employee_name,
+            'national_id_last3': _national_id_last3(national_id),
             'department': clean_str(get_value(row, ['所屬單位'])),
             'job_title': clean_str(get_value(row, ['職稱'])),
             'onboard_date': parse_date(get_value(row, ['到職日']), default=None),
@@ -211,9 +240,9 @@ def _import_combined_row(row, row_num):
     Account.objects.update_or_create(
         employee=employee,
         system=system,
+        username=username,
+        email=email,
         defaults={
-            'username': username,
-            'email': email,
             'has_permission': parse_permission(row),
         },
     )

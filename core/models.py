@@ -3,6 +3,8 @@ from django.db import models
 # 1. 員工表
 class Employee(models.Model):
     name = models.CharField(max_length=50, verbose_name="姓名")
+    national_id_hash = models.CharField(max_length=64, unique=True, verbose_name="身分證雜湊值")
+    national_id_last3 = models.CharField(max_length=3, blank=True, default="", verbose_name="身分證末三碼")
     department = models.CharField(max_length=50, null=True, blank=True, verbose_name="所屬單位")
     job_title = models.CharField(max_length=50, null=True, blank=True, verbose_name="職稱")
     onboard_date = models.DateField(verbose_name="到職日")
@@ -38,8 +40,8 @@ class Account(models.Model):
     has_permission = models.BooleanField(default=True, verbose_name="權限")
 
     class Meta:
-        # 防呆機制：一人一系統只能有一組帳號！
-        unique_together = ('employee', 'system')
+        # 防呆機制：四欄全同才視為重複。
+        unique_together = ('employee', 'system', 'username', 'email')
         verbose_name = "帳戶"
         verbose_name_plural = "帳戶"
 
