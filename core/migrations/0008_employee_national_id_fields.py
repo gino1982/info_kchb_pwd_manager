@@ -11,8 +11,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='employee',
             name='national_id_hash',
-            field=models.CharField(default='', max_length=64, unique=True, verbose_name='身分證雜湊值'),
-            preserve_default=False,
+            field=models.CharField(blank=True, max_length=64, null=True, unique=True, verbose_name='身分證雜湊值'),
         ),
         migrations.AddField(
             model_name='employee',
