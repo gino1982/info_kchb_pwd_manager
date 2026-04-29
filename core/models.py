@@ -3,6 +3,8 @@ from django.db import models
 # 1. 員工表
 class Employee(models.Model):
     name = models.CharField(max_length=50, verbose_name="姓名")
+    national_id_hash = models.CharField(max_length=64, unique=True, verbose_name="身分證雜湊值")
+    national_id_last3 = models.CharField(max_length=3, blank=True, default="", verbose_name="身分證末三碼")
     department = models.CharField(max_length=50, null=True, blank=True, verbose_name="所屬單位")
     job_title = models.CharField(max_length=50, null=True, blank=True, verbose_name="職稱")
     onboard_date = models.DateField(verbose_name="到職日")
