@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.core.exceptions import PermissionDenied
 from django.urls import path
 from django.utils.html import format_html
 import hashlib
@@ -66,7 +67,12 @@ class EmployeeAdmin(admin.ModelAdmin):
         ]
         return my_urls + super().get_urls()
 
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
     def import_excel(self, request):
+        if not self.has_add_permission(request):
+            raise PermissionDenied
         return handle_excel_import(
             request,
             template_name="admin/excel_upload.html",
@@ -108,7 +114,12 @@ class SystemAppAdmin(admin.ModelAdmin):
         ]
         return my_urls + super().get_urls()
 
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
     def import_excel(self, request):
+        if not self.has_add_permission(request):
+            raise PermissionDenied
         return handle_excel_import(
             request,
             template_name="admin/excel_upload_systemapp.html",
@@ -159,7 +170,12 @@ class AccountAdmin(admin.ModelAdmin):
         ]
         return my_urls + super().get_urls()
 
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
     def import_excel(self, request):
+        if not self.has_add_permission(request):
+            raise PermissionDenied
         return handle_excel_import(
             request,
             template_name="admin/excel_upload_account.html",
@@ -168,6 +184,8 @@ class AccountAdmin(admin.ModelAdmin):
         )
 
     def import_combined_excel(self, request):
+        if not self.has_add_permission(request):
+            raise PermissionDenied
         return handle_excel_import(
             request,
             template_name="admin/excel_upload_combined.html",

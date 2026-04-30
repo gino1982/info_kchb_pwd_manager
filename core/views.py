@@ -1,3 +1,4 @@
+from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.db.models import Count
@@ -10,6 +11,7 @@ def home(request):
     return render(request, 'index.html')
 
 # ⬇️⬇️⬇️ 新增：專門給圖表呼叫的數據 API ⬇️⬇️⬇️
+@staff_member_required(login_url='/admin/login/')
 def dashboard_api(request):
     # 1. 計算「各單位」有幾名員工
     dept_data = Employee.objects.values('department').annotate(count=Count('id'))
