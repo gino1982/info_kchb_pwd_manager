@@ -158,6 +158,26 @@
         border-left: 3px solid #B4502E !important;
     }
 
+    /* 左側導覽列區塊標題（單一授權管理、局內系統管理）*/
+    #nav-sidebar .module caption,
+    #nav-sidebar .module caption a {
+        font-family: "Noto Serif TC", "Source Han Serif TC", serif !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        text-align: center !important;
+        letter-spacing: 0.5px !important;
+    }
+    #nav-sidebar .module caption a {
+        pointer-events: none !important;
+        cursor: default !important;
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+    #nav-sidebar .module caption a:hover {
+        color: inherit !important;
+        text-decoration: none !important;
+    }
+
     /* 新增這段：控制「成功」提示訊息的顏色*/
     ul.messagelist li.success {
         background-color: #E8D5C4 !important; /* 這裡換成你想要的底色 (例如：淺奶茶色) */
@@ -251,6 +271,129 @@
         }
     }
 
+    /* ============================================================
+       過濾器 (Filter Sidebar) — Warm Earth 整合設計
+       ============================================================ */
+
+    /* 外框：同模組卡片圓角風格 */
+    #changelist-filter {
+        background: #F5EFE4 !important;
+        border-radius: 20px !important;
+        overflow: hidden !important;
+        border: 1px solid rgba(61, 53, 40, 0.10) !important;
+        padding: 0 !important;
+    }
+
+    /* 標題列「過濾器」 */
+    #changelist-filter h2 {
+        background: #B4502E !important;
+        color: #FFFCF6 !important;
+        font-family: "Noto Serif TC", "Source Han Serif TC", serif !important;
+        font-weight: 700 !important;
+        font-size: 14px !important;
+        letter-spacing: 1.5px !important;
+        text-align: center !important;
+        padding: 12px 16px !important;
+        margin: 0 !important;
+    }
+
+    /* 頂部「顯示計數」連結區 */
+    #changelist-filter-extra {
+        padding: 10px 16px !important;
+        border-bottom: 1px solid rgba(61, 53, 40, 0.10) !important;
+    }
+    #changelist-filter-extra a {
+        font-size: 12px !important;
+        color: #933E23 !important;
+        text-decoration: none !important;
+    }
+    #changelist-filter-extra a:hover {
+        color: #712E1B !important;
+        text-decoration: underline !important;
+    }
+
+    /* 每個篩選區塊 */
+    #changelist-filter details {
+        border-bottom: 1px solid rgba(61, 53, 40, 0.08) !important;
+        padding: 0 !important;
+    }
+    #changelist-filter details:last-child {
+        border-bottom: none !important;
+    }
+
+    /* 區塊標題 <summary>（Django 6 新結構）與舊版 h3 共用 */
+    #changelist-filter details summary,
+    #changelist-filter h3 {
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        letter-spacing: 1.2px !important;
+        text-transform: uppercase !important;
+        color: #5E5340 !important;
+        padding: 10px 16px 8px !important;
+        margin: 0 !important;
+        cursor: pointer !important;
+        list-style: none !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        background: transparent !important;
+    }
+    #changelist-filter details summary::-webkit-details-marker {
+        display: none !important;
+    }
+    /* 展開 / 收合箭頭 */
+    #changelist-filter details summary::before {
+        content: "▾" !important;
+        font-size: 20px !important;
+        color: #B4502E !important;
+        display: inline-block !important;
+        transition: transform 100ms ease !important;
+    }
+    #changelist-filter details:not([open]) summary::before {
+        transform: rotate(-90deg) !important;
+    }
+
+    /* 選項列表 */
+    #changelist-filter ul {
+        list-style: none !important;
+        margin: 0 0 8px !important;
+        padding: 0 12px 4px !important;
+    }
+    #changelist-filter li {
+        margin: 3px 0 !important;
+    }
+
+    /* 篩選連結：pill 膠囊風格 */
+    #changelist-filter li a {
+        display: block !important;
+        padding: 5px 12px !important;
+        border-radius: 20px !important;
+        font-size: 13px !important;
+        color: #5C3A21 !important;
+        text-decoration: none !important;
+        transition: background 120ms ease, color 120ms ease !important;
+        line-height: 1.5 !important;
+    }
+    #changelist-filter li a:hover {
+        background: #FBEDE6 !important;
+        color: #712E1B !important;
+    }
+
+    /* 目前選取中的項目 */
+    #changelist-filter li.selected {
+        border-left: none !important;
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+    }
+    #changelist-filter li.selected a {
+        background: #B4502E !important;
+        color: #FFFCF6 !important;
+        font-weight: 600 !important;
+    }
+    #changelist-filter li.selected a:hover {
+        background: #933E23 !important;
+        color: #FFFCF6 !important;
+    }
 
 </style>
 {% endblock %}
