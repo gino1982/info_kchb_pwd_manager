@@ -47,7 +47,7 @@ def _national_id_last3(national_id):
 # 1. 註冊員工表
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'national_id_mask', 'department', 'job_title', 'onboard_date', 'is_active')
+    list_display = ('name', 'national_id_mask', 'department', 'job_title', 'onboard_date', 'active_badge')
     list_filter = ('is_active', 'department')
     search_fields = ('name', 'national_id_last3', 'department', 'job_title')
 
@@ -56,6 +56,10 @@ class EmployeeAdmin(admin.ModelAdmin):
         if not obj.national_id_last3:
             return ""
         return f"***{obj.national_id_last3}"
+
+    @admin.display(description='是否在職', ordering='is_active', boolean=False)
+    def active_badge(self, obj):
+        return _render_permission(obj.is_active)
 
     def get_urls(self):
         my_urls = [
