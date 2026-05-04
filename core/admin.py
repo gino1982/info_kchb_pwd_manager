@@ -50,6 +50,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('name', 'national_id_mask', 'department', 'job_title', 'onboard_date', 'active_badge')
     list_filter = ('is_active', 'department')
     search_fields = ('name', 'national_id_last3', 'department', 'job_title')
+    readonly_fields = ('active_badge',)
 
     @admin.display(description='身分證末三碼', ordering='national_id_last3')
     def national_id_mask(self, obj):
@@ -60,6 +61,12 @@ class EmployeeAdmin(admin.ModelAdmin):
     @admin.display(description='是否在職', ordering='is_active', boolean=False)
     def active_badge(self, obj):
         return _render_permission(obj.is_active)
+
+    def get_fields(self, request, obj=None):
+        base = ['name', 'national_id_hash', 'national_id_last3', 'department', 'job_title', 'onboard_date', 'resign_date']
+        if request.user.is_superuser or request.user.has_perm('core.change_employee'):
+            return base + ['is_active']
+        return base + ['active_badge']
 
     def get_urls(self):
         my_urls = [
@@ -149,10 +156,16 @@ class AccountAdmin(admin.ModelAdmin):
     list_display = ('employee', 'system', 'email', 'username', 'permission_badge')
     list_filter = ('has_permission', 'system')
     search_fields = ('employee__name', 'username')
+    readonly_fields = ('permission_badge',)
 
     @admin.display(description='權限', ordering='has_permission', boolean=False)
     def permission_badge(self, obj):
         return _render_permission(obj.has_permission)
+
+    def get_fields(self, request, obj=None):
+        if request.user.is_superuser or request.user.has_perm('core.change_account'):
+            return ['employee', 'system', 'email', 'username', 'has_permission']
+        return ['employee', 'system', 'email', 'username', 'permission_badge']
 
     def get_urls(self):
         my_urls = [
